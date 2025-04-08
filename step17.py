@@ -1,8 +1,9 @@
 """
-STEP 16
-복잡한 계산 그래프(구현 편)
+STEP 17
+메모리 관리와 순환 참조
 """
 import numpy as np
+import weakref    # 추가
 
 
 class Variable:
@@ -14,7 +15,7 @@ class Variable:
         self.data = data
         self.grad = None
         self.creator = None
-        self.generation = 0    # 추가
+        self.generation = 0
 
     def set_creator(self, func):
         self.creator = func
@@ -24,31 +25,31 @@ class Variable:
         if self.grad is None:
             self.grad = np.ones_like(self.data)
 
-        funcs = []    # 추가
-        seen_set = set()    # 추가
+        funcs = []
+        seen_set = set()
 
-        def add_func(f):    # 추가
-            if f not in seen_set:    # 추가
-                funcs.append(f)    # 추가
-                seen_set.add(f)    # 추가
-                funcs.sort(key=lambda x: x.generation)    # 추가
+        def add_func(f):
+            if f not in seen_set:
+                funcs.append(f)
+                seen_set.add(f)
+                funcs.sort(key=lambda x: x.generation)
 
-        add_func(self.creator)    # 추가
+        add_func(self.creator)
 
         while funcs:
             f = funcs.pop()
-            gys = [output.grad for output in f.outputs]
+            gys = [output().grad for output in f.outputs]    # 변경
             gxs = f.backward(*gys)
             if not isinstance(gxs, tuple):
                 gxs = (gxs, )
 
-            for x, gx in zip(f.inputs, gxs): #grad를 input에 matching
-                if x.grad is None:    # 변경
-                    x.grad = gx    # 변경
-                else:    # 변경
-                    x.grad = x.grad + gx    # 변경
+            for x, gx in zip(f.inputs, gxs):
+                if x.grad is None:
+                    x.grad = gx
+                else:
+                    x.grad = x.grad + gx
 
-                if x.creator is not None: #true : creator를 더 넣음, false : while문 종료
+                if x.creator is not None:
                     add_func(x.creator)
 
     def cleargrad(self):
@@ -56,18 +57,18 @@ class Variable:
 
 
 class Function():
-    def __call__(self, *inputs): #call이 원래 없는데 정의를 해줌
-        xs = [x.data for x in inputs] #ndarray들의 리스트로 만들어짐
+    def __call__(self, *inputs):
+        xs = [x.data for x in inputs]
         ys = self.forward(*xs)
-        if not isinstance(ys, tuple): #ys가 튜플인지 검사
-            ys = (ys, ) #튜플이 아니면 튜플로 만들기
-        outputs = [Variable(as_array(y)) for y in ys] #
+        if not isinstance(ys, tuple):
+            ys = (ys, )
+        outputs = [Variable(as_array(y)) for y in ys]
 
-        self.generation = max([x.generation for x in inputs])    # 추가
+        self.generation = max([x.generation for x in inputs])
         for output in outputs:
             output.set_creator(self)
         self.inputs = inputs
-        self.outputs = outputs
+        self.outputs = [weakref.ref(output) for output in outputs]    # 추가
 
         return outputs if len(outputs) > 1 else outputs[0]
 
@@ -115,7 +116,7 @@ def as_array(x):
 if __name__ == "__main__":
     import gc
 
-    print(gc.collect())
+    gc.collect()
     for i in range(10):
         x = Variable(np.random.randn(10000))
         y = square(square(square(x)))
