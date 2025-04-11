@@ -1,0 +1,13 @@
+Metadata-Version: 2.4
+Name: cpnn
+Version: 0.1.0
+Summary: NN module
+Author-email: iyjang <dudfine1026@naver.com>
+License: MIT
+Project-URL: Homepage, https://github.com:iyjang1026/UOU-computational-physics
+Project-URL: Repository, https://github.com:iyjang1026/UOU-computational-physics
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+Requires-Dist: numpy
+
+# UOU-computational-physics
