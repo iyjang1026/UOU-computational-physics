@@ -1,25 +1,24 @@
 [build-system]
-requires = ["setuptools>=59.0.1"]
+requires = ["setuptools>=75.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "cpnn"
 version = "0.1.0"
-description = "NN module"
+description = "전산물리 학습용 신경망 모듈"
 readme = "README.md"
 authors = [
-	{ name="iyjang", email="dudfine1026@naver.com"}
+    { name="Young-Han Shin", email="yhshin.at.uou@gmail.com" }
 ]
-license = { text = "MIT"}
+license = { text = "MIT" }
 dependencies = [
-	"numpy",
+    "numpy",
 ]
 requires-python = ">=3.8"
 
 [project.urls]
-"Homepage" = "https://github.com:iyjang1026/UOU-computational-physics"
-"Repository" = "https://github.com:iyjang1026/UOU-computational-physics"
+"Homepage" = "https://gitlab.com:yhshin/cpnn"
+"Repository" = "https://gitlab.com:yhshin/cpnn"
 
 [tool.setuptools.packages.find]
 where = ["."]
-

@@ -1,4 +1,4 @@
-is_simple_core = True
+is_simple_core = False
 
 if is_simple_core:
     from cpnn.core_simple import Variable

@@ -1,18 +1,48 @@
-import cpnn.core_simple as cs
+"""
+STEP 24
+복잡한 함수의 미분
+"""
 import numpy as np
+from cpnn import Variable
 
-def sphere(x0, x1):
-    z = x0**2 + x1**2
+
+def sphere(x, y):
+    z = x ** 2 + y ** 2
     return z
-def matyas(x0, x1):
-    z = 0.26 * (x0 ** 2 + x1 ** 2) - 0.48 * x0 * x1
+
+
+def matyas(x, y):
+    z = 0.26 * (x ** 2 + y ** 2) - 0.48 * x * y
     return z
 
-x = cs.Variable(np.array(1.0))
-y = cs.Variable(np.array(1.0))
 
-z = matyas(x, y)
+def goldstein(x, y):
+    z = (
+            1 + (x + y + 1) ** 2 *
+            (19 - 14 * x + 3 * x ** 2 - 14 * y + 6 * x * y + 3 * y ** 2)
+        ) * (
+            30 + (2 * x - 3 * y) ** 2 *
+            (18 - 32 * x + 12 * x ** 2 + 48 * y - 36 * x * y + 27 * y ** 2)
+        )
+    return z
 
-z.backward()
 
-print(x.grad, y.grad)
+if __name__ == "__main__":
+    x = Variable(np.array(1.0))
+    y = Variable(np.array(1.0))
+    z = sphere(x, y)
+    z.backward()
+    print(x.grad, y.grad)    # 2.0 2.0
+
+
+    x = Variable(np.array(1.0))
+    y = Variable(np.array(1.0))
+    z = matyas(x, y)
+    z.backward()
+    print(x.grad, y.grad)    # 0.04 0.04
+
+    x = Variable(np.array(1.0))
+    y = Variable(np.array(1.0))
+    z = goldstein(x, y)
+    z.backward()
+    print(x.grad, y.grad)    # -5376. 8064.
