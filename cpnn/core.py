@@ -1,6 +1,7 @@
 import numpy as np
 import weakref
 import contextlib
+import cpnn
 
 
 class Config:
@@ -89,8 +90,25 @@ class Variable:
         p = str(self.data).replace('\n', '\n' + ' ' * 9)
         return 'variable(' + p + ')'
 
-    def sum(self):
-        return sum(self)
+    def sum(self, axis=None, keepdims=False):
+        return cpnn.functions.sum(self, axis, keepdims)
+
+    def reshape(self, *shape):
+        if len(shape) == 1 and isinstance(shape[0], (tuple, list)):
+            shape = shape[0]
+        return cpnn.functions.reshape(self, shape)
+
+    def transpose(self, *axes):
+        if len(axes) == 0:
+            axes = None
+        elif len(axes) == 1:
+            if isinstance(axes[0], (tuple, list)) or axes[0] is None:
+                axes = axes[0]
+        return cpnn.functions.transpose(self, axes)
+
+    @property
+    def T(self):
+        return cpnn.functions.transpose(self)
 
 
 class Function():
@@ -120,11 +138,16 @@ class Function():
 
 class Add(Function):
     def forward(self, x0, x1):
+        self.x0_shape, self.x1_shape = x0.shape, x1.shape
         y = x0 + x1
         return y
 
     def backward(self, gy):
-        return gy, gy
+        gx0, gx1 = gy, gy
+        if self.x0_shape != self.x1_shape:
+            gx0 = cpnn.functions.sum_to(gx0, self.x0_shape)
+            gx1 = cpnn.functions.sum_to(gx1, self.x1_shape)
+        return gx0, gx1
 
 
 def add(x0, x1):
@@ -216,19 +239,6 @@ class Pow(Function):
 
 def pow(x, c):
     return Pow(c)(x)
-
-
-class Sum(Function):
-    def forward(self, x):
-        self.x_shape = x.shape
-        return np.array(x.sum())
-
-    def backward(self, gy):
-        return gy * Variable(np.ones(self.x_shape))
-
-
-def sum(x):
-    return Sum()(x)
 
 
 def as_array(x):

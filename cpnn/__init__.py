@@ -17,4 +17,7 @@ else:
     from cpnn.core import as_variable
     from cpnn.core import setup_variable
 
+    import cpnn.functions
+    import cpnn.cuda
+
 setup_variable()

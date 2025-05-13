@@ -3,6 +3,7 @@ pyproject.toml
 cpnn/__init__.py
 cpnn/core.py
 cpnn/core_simple.py
+cpnn/cuda.py
 cpnn/functions.py
 cpnn/utils.py
 cpnn.egg-info/PKG-INFO
