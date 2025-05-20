@@ -16,8 +16,17 @@ else:
     from cpnn.core import as_array
     from cpnn.core import as_variable
     from cpnn.core import setup_variable
+    from cpnn.core import Parameter
+    from cpnn.layers import Layer
+    from cpnn.models import Model
+    from cpnn.datasets import Dataset
 
     import cpnn.functions
+    import cpnn.layers
+    import cpnn.utils
     import cpnn.cuda
+    import cpnn.optimizers
+    import cpnn.datasets
+
 
 setup_variable()

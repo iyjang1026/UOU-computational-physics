@@ -278,3 +278,13 @@ def setup_variable():
     Variable.__truediv__ = div
     Variable.__rtruediv__ = rdiv
     Variable.__pow__ = pow
+    Variable.__getitem__ = cpnn.functions.get_item
+
+    Variable.matmaul = cpnn.functions.matmul
+    Variable.dot = cpnn.functions.matmul
+    Variable.max = cpnn.functions.max
+    Variable.min = cpnn.functions.min
+
+
+class Parameter(Variable):
+    pass

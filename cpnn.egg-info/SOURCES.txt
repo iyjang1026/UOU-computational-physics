@@ -4,7 +4,12 @@ cpnn/__init__.py
 cpnn/core.py
 cpnn/core_simple.py
 cpnn/cuda.py
+cpnn/datasets.py
 cpnn/functions.py
+cpnn/layers.py
+cpnn/models.py
+cpnn/optimizers.py
+cpnn/transforms.py
 cpnn/utils.py
 cpnn.egg-info/PKG-INFO
 cpnn.egg-info/SOURCES.txt
