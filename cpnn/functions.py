@@ -1,8 +1,7 @@
 import numpy as np
 import cpnn
-from cpnn.core import Function
-from cpnn.core import as_variable
 from cpnn import cuda, utils
+from cpnn.core import Function, Variable, as_variable, as_array
 
 
 class Sin(Function):
@@ -48,6 +47,38 @@ class Tanh(Function):
 
 def tanh(x):
     return Tanh()(x)
+
+
+class Exp(Function):
+    def forward(self, x):
+        xp = cuda.get_array_module(x)
+        y = xp.exp(x)
+        return y
+
+    def backward(self, gy):
+        y = self.outputs[0]()  # weakref
+        gx = gy * y
+        return gx
+
+
+def exp(x):
+    return Exp()(x)
+
+
+class Log(Function):
+    def forward(self, x):
+        xp = cuda.get_array_module(x)
+        y = xp.log(x)
+        return y
+
+    def backward(self, gy):
+        x, = self.inputs
+        gx = gy / x
+        return gx
+
+
+def log(x):
+    return Log()(x)
 
 
 class Reshape(Function):
@@ -414,3 +445,27 @@ class Clip(Function):
 
 def clip(x, x_min, x_max):
     return Clip(x_min, x_max)(x)
+
+
+def accuracy(y, t):
+    y, t = as_variable(y), as_variable(t)
+
+    pred = y.data.argmax(axis=1).reshape(t.shape)
+    result = (pred == t.data)
+    acc = result.mean()
+    return Variable(as_array(acc))
+
+
+def dropout(x, dropout_ratio=0.5):
+    x = as_variable(x)
+
+    if cpnn.Config.train:
+        xp = cuda.get_array_module(x)
+        mask = xp.random.rand(*x.shape) > dropout_ratio
+        scale = xp.array(1.0 - dropout_ratio).astype(x.dtype)
+        y = x * mask / scale
+        return y
+    else:
+        return x
+
+

@@ -6,6 +6,7 @@ import cpnn
 
 class Config:
     enable_backprop = True
+    train = True
 
 
 class Variable:
@@ -109,6 +110,14 @@ class Variable:
     @property
     def T(self):
         return cpnn.functions.transpose(self)
+
+    def to_cpu(self):
+        if self.data is not None:
+            self.data = cpnn.cuda.as_numpy(self.data)
+
+    def to_gpu(self):
+        if self.data is not None:
+            self.data = cpnn.cuda.as_cupy(self.data)
 
 
 class Function():
@@ -261,6 +270,10 @@ def using_config(name, value):
         yield
     finally:
         setattr(Config, name, old_value)
+
+
+def test_mode():
+    return using_config('train', False)
 
 
 def no_grad():
